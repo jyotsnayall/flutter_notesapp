@@ -40,34 +40,69 @@ mixin _$NotesStore on _NotesStore, Store {
     });
   }
 
-  late final _$getNotesAsyncAction =
-      AsyncAction('_NotesStore.getNotes', context: context);
+  late final _$boxAtom = Atom(name: '_NotesStore.box', context: context);
 
   @override
-  Future<void> getNotes() {
-    return _$getNotesAsyncAction.run(() => super.getNotes());
+  Box<NotesModel> get box {
+    _$boxAtom.reportRead();
+    return super.box;
+  }
+
+  bool _boxIsInitialized = false;
+
+  @override
+  set box(Box<NotesModel> value) {
+    _$boxAtom.reportWrite(value, _boxIsInitialized ? super.box : null, () {
+      super.box = value;
+      _boxIsInitialized = true;
+    });
+  }
+
+  late final _$initAsyncAction =
+      AsyncAction('_NotesStore.init', context: context);
+
+  @override
+  Future<void> init() {
+    return _$initAsyncAction.run(() => super.init());
+  }
+
+  late final _$editNoteAsyncAction =
+      AsyncAction('_NotesStore.editNote', context: context);
+
+  @override
+  Future<void> editNote(NotesModel note, String title, String description) {
+    return _$editNoteAsyncAction
+        .run(() => super.editNote(note, title, description));
+  }
+
+  late final _$removeNoteAsyncAction =
+      AsyncAction('_NotesStore.removeNote', context: context);
+
+  @override
+  Future<void> removeNote(NotesModel note) {
+    return _$removeNoteAsyncAction.run(() => super.removeNote(note));
   }
 
   late final _$_NotesStoreActionController =
       ActionController(name: '_NotesStore', context: context);
 
   @override
-  void addNote(NotesModel note) {
+  void getNotes() {
     final _$actionInfo =
-        _$_NotesStoreActionController.startAction(name: '_NotesStore.addNote');
+        _$_NotesStoreActionController.startAction(name: '_NotesStore.getNotes');
     try {
-      return super.addNote(note);
+      return super.getNotes();
     } finally {
       _$_NotesStoreActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void removeNote(NotesModel note) {
-    final _$actionInfo = _$_NotesStoreActionController.startAction(
-        name: '_NotesStore.removeNote');
+  void addNote(String title, String description) {
+    final _$actionInfo =
+        _$_NotesStoreActionController.startAction(name: '_NotesStore.addNote');
     try {
-      return super.removeNote(note);
+      return super.addNote(title, description);
     } finally {
       _$_NotesStoreActionController.endAction(_$actionInfo);
     }
@@ -77,7 +112,8 @@ mixin _$NotesStore on _NotesStore, Store {
   String toString() {
     return '''
 notes: ${notes},
-initHiveDB: ${initHiveDB}
+initHiveDB: ${initHiveDB},
+box: ${box}
     ''';
   }
 }

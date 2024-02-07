@@ -43,4 +43,5 @@ app.*.map.json
 /android/app/release
 
 lib/screens/home_screen mob.dart
+lib/screens/home_screen--og.dart
 lib/main_copy.dart

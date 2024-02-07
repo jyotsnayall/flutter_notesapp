@@ -5,6 +5,10 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:notesapp/boxes/boxes.dart';
 import 'package:notesapp/models/notes_model.dart';
+import 'package:notesapp/screens/note_details_screen.dart';
+import 'package:notesapp/stores/notes_store.dart';
+
+final NotesStore store = NotesStore();
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,76 +33,83 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    store.init();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xff252525),
       appBar: AppBar(
-        title: const Text('Notes App'),
+        title: const Text(
+          'Notes App',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 25,
+          ),
+        ),
+        backgroundColor: Color(0xff252525),
       ),
-      body: ValueListenableBuilder<Box<NotesModel>>(
-        valueListenable: Boxes.getNotes().listenable(),
-        builder: (context, box, _) {
-          var data = box.values.toList().cast<NotesModel>();
-
-          // double aspectRatio = MediaQuery.of(context).size.width ; // 150 is the desired width of the item
-
-          // return GridView.builder(
-          return MasonryGridView.count(
-            crossAxisCount: 2,
-            mainAxisSpacing: 4,
-            crossAxisSpacing: 4,
-            itemCount: data.length,
-            itemBuilder: (context, index) {
-              NotesModel note = data[index];
-
-              Color color = colors[index % colors.length];
-              return InkWell(
-                onTap: () {
-                  print('tapped');
-                },
-                child: Card(
-                  color: color,
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Flexible(
-                              flex: 3,
-                              child: Text(
-                                data[index].title.toString(),
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color.fromARGB(207, 0, 0, 0),
+      body: Observer(
+        builder: (context) {
+          if (!store.initHiveDB) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          return Padding(
+            padding: EdgeInsets.only(top: 16.0),
+            child: MasonryGridView.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+              itemCount: store.notes.length,
+              itemBuilder: (BuildContext context, int index) {
+                final note = store.notes[index];
+                final color = colors[index % colors.length];
+                return InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => NoteDetails(note: note),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    color: color,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  note.title,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                maxLines: 2,
-                                softWrap: true,
-                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                            Spacer(),
-                            Expanded(
-                              child: InkWell(
+                              InkWell(
                                 child: Icon(Icons.delete, color: Colors.red),
                                 onTap: () {
-                                  delete(data[index]);
+                                  store.removeNote(note);
                                 },
                               ),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Expanded(
-                              child: InkWell(
+                              SizedBox(width: 10),
+                              InkWell(
                                 onTap: () {
                                   _editDialog(
-                                    data[index],
-                                    data[index].title.toString(),
-                                    data[index].description.toString(),
+                                    note,
+                                    note.title.toString(),
+                                    note.description.toString(),
                                   );
                                 },
                                 child: Icon(
@@ -106,54 +117,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                   color: const Color.fromARGB(207, 0, 0, 0),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        Text(data[index].description.toString()),
-                      ],
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            note.description,
+                            style: TextStyle(fontSize: 14),
+                            maxLines: 8,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         },
       ),
-      // body: Column(
-      //   children: [
-      //     FutureBuilder(
-      //       future: Hive.openBox('testnote'),
-      //       builder: (context, snapshot) {
-      //         return Column(
-      //           children: [
-      //             ListTile(
-      //               title: Text(
-      //                   'Title: ${snapshot.data!.get('title').toString()}'),
-      //               subtitle:
-      //                   Text(snapshot.data!.get('description').toString()),
-      //               trailing: IconButton(
-      //                 icon: const Icon(Icons.edit),
-      //                 onPressed: () {
-      //                   snapshot.data!.put('title', 'Updated title');
-      //                 },
-      //               ),
-      //             ),
-      //           ],
-      //         );
-      //       },
-      //     ),
-      //   ],
-      // ),
       floatingActionButton: FloatingActionButton(
-        // onPressed: () async {
-        //   var box = await Hive.openBox('testnote');
-
-        //   box.put('title', 'My first note');
-        //   box.put('description', 'lorem ipsum first note');
-
-        //   print(box.get('title'));
-        //   print(box.get('description'));
-        // },
         onPressed: () {
           _showMyDialog();
         },
@@ -162,12 +145,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void delete(NotesModel notesModel) async {
-    await notesModel.delete();
-  }
-
   Future<void> _editDialog(
-      NotesModel notesModel, String title, String description) async {
+      NotesModel note, String title, String description) async {
     titleController.text = title;
     descriptionController.text = description;
 
@@ -209,11 +188,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () async {
-                notesModel.title = titleController.text;
-                notesModel.description = descriptionController.text;
-
-                await notesModel.save();
+              onPressed: () {
+                store.editNote(
+                    note, titleController.text, descriptionController.text);
 
                 titleController.clear();
                 descriptionController.clear();
@@ -228,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _showMyDialog() async {
+  Future<void> _showMyDialog() {
     return showDialog(
       context: context,
       builder: (context) {
@@ -259,31 +236,32 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           actions: [
             TextButton(
+              child: Text('Cancel'),
               onPressed: () {
                 titleController.clear();
                 descriptionController.clear();
 
                 Navigator.pop(context);
               },
-              child: Text('Cancel'),
             ),
             TextButton(
+              child: Text('Add'),
               onPressed: () {
-                final data = NotesModel(
-                  title: titleController.text,
-                  description: descriptionController.text,
-                );
+                // final data = NotesModel(
+                //   title: titleController.text,
+                //   description: descriptionController.text,
+                // );
 
-                final box = Boxes.getNotes();
-                box.add(data);
+                // final box = Boxes.getNotes();
+                // box.add(data);
 
-                data.save();
+                // data.save();
+                store.addNote(titleController.text, descriptionController.text);
                 titleController.clear();
                 descriptionController.clear();
 
                 Navigator.pop(context);
               },
-              child: Text('Add'),
             ),
           ],
         );

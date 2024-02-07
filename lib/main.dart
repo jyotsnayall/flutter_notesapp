@@ -5,13 +5,7 @@ import 'package:notesapp/screens/home_screen.dart';
 import 'package:path_provider/path_provider.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  var directory = await getApplicationDocumentsDirectory();
-  Hive.init(directory.path);
-
-  Hive.registerAdapter(NotesModelAdapter());
-
-  await Hive.openBox<NotesModel>('notes');
+  // WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
