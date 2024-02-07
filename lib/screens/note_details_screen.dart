@@ -4,7 +4,7 @@ import 'package:notesapp/models/notes_model.dart';
 class NoteDetails extends StatelessWidget {
   // String title;
   // String description;
-  NotesModel note;
+  final NotesModel note;
 
   NoteDetails({
     super.key,

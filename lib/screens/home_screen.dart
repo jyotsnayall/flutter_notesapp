@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:notesapp/boxes/boxes.dart';
 import 'package:notesapp/models/notes_model.dart';
 import 'package:notesapp/screens/note_details_screen.dart';
 import 'package:notesapp/stores/notes_store.dart';
