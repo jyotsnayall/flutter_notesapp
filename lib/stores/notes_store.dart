@@ -19,17 +19,12 @@ abstract class _NotesStore with Store {
 
   @action
   Future<void> init() async {
-    print("gonna execute init store");
     var directory = await getApplicationDocumentsDirectory();
     Hive.init(directory.path);
     Hive.registerAdapter(NotesModelAdapter());
-
-    print("registered adaptor");
-
     box = await Hive.openBox<NotesModel>('notes');
-    print("opened box");
     notes = box.values.toList().cast<NotesModel>().asObservable();
-    print("list");
+    print("opened box and got notes");
 
     initHiveDB = true;
   }
@@ -49,7 +44,7 @@ abstract class _NotesStore with Store {
   @action
   Future<void> editNote(final NotesModel note, final String title,
       final String description) async {
-    final updatedNote = NotesModel(title: title, description: description);
+    var updatedNote = NotesModel(title: title, description: description);
 
     // final index = notes.indexWhere((element) => element.title == note.title);
     // print(index);
@@ -58,6 +53,11 @@ abstract class _NotesStore with Store {
     // }
 
     await box.put(note.title, updatedNote);
+    final debugNotes = box.values.toList().cast<NotesModel>();
+    print('edited in box');
+    for (var note in debugNotes) {
+      print(note.title);
+    }
     getNotes();
   }
 

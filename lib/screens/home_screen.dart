@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:notesapp/models/notes_model.dart';
+import 'package:notesapp/screens/edit_note_screen.dart';
 import 'package:notesapp/screens/note_details_screen.dart';
 import 'package:notesapp/stores/notes_store.dart';
 
@@ -108,6 +109,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                     note.title.toString(),
                                     note.description.toString(),
                                   );
+                                  // Navigator.of(context).push(
+                                  //   MaterialPageRoute(
+                                  //     builder: (context) =>
+                                  //         EditNote(note: note),
+                                  //   ),
+                                  // );
                                 },
                                 child: Icon(
                                   Icons.edit,
