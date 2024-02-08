@@ -5,6 +5,7 @@ import 'package:notesapp/models/notes_model.dart';
 import 'package:notesapp/screens/edit_note_screen.dart';
 import 'package:notesapp/screens/note_details_screen.dart';
 import 'package:notesapp/stores/notes_store.dart';
+import 'package:notesapp/widgets/main_drawer.dart';
 
 final NotesStore store = NotesStore();
 
@@ -16,6 +17,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
+
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
 
@@ -48,8 +51,28 @@ class _HomeScreenState extends State<HomeScreen> {
             fontSize: 25,
           ),
         ),
+        // title: Padding(
+        //   padding: const EdgeInsets.only(right: 15, top: 10),
+        //   child: Container(
+        //     color: Color.fromARGB(255, 68, 68, 68),
+        //     width: MediaQuery.of(context).size.width,
+        //     child: Padding(
+        //       padding: const EdgeInsets.all(10.0),
+        //       child: Text(
+        //         'Notes App',
+        //         style: TextStyle(
+        //           color: Colors.white,
+        //           fontSize: 25,
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
         backgroundColor: Color(0xff252525),
+        iconTheme: IconThemeData(color: Colors.white),
       ),
+      key: _drawerKey,
+      drawer: MainDrawer(),
       body: Observer(
         builder: (context) {
           if (!store.initHiveDB) {

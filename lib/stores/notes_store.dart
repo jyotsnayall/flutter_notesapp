@@ -9,7 +9,7 @@ class NotesStore = _NotesStore with _$NotesStore;
 
 abstract class _NotesStore with Store {
   @observable
-  ObservableList<NotesModel> notes = ObservableList<NotesModel>();
+  List<NotesModel> notes = ObservableList<NotesModel>();
 
   @observable
   bool initHiveDB = false;
@@ -23,7 +23,7 @@ abstract class _NotesStore with Store {
     Hive.init(directory.path);
     Hive.registerAdapter(NotesModelAdapter());
     box = await Hive.openBox<NotesModel>('notes');
-    notes = box.values.toList().cast<NotesModel>().asObservable();
+    notes = box.values.toList().cast<NotesModel>();
     print("opened box and got notes");
 
     initHiveDB = true;
@@ -31,7 +31,7 @@ abstract class _NotesStore with Store {
 
   @action
   void getNotes() {
-    notes = box.values.toList().cast<NotesModel>().asObservable();
+    notes = box.values.toList().cast<NotesModel>();
   }
 
   @action
