@@ -6,10 +6,12 @@ import 'package:notesapp/stores/notes_store.dart';
 final NotesStore store = NotesStore();
 
 class EditNote extends StatefulWidget {
-  final NotesModel note;
+  // final NotesModel note;
+  final String noteId;
   EditNote({
     super.key,
-    required this.note,
+    // required this.note,
+    required this.noteId,
   });
 
   @override
@@ -29,8 +31,11 @@ class _EditNoteState extends State<EditNote> {
 
   @override
   Widget build(BuildContext context) {
-    titleController.text = widget.note.title;
-    descriptionController.text = widget.note.description;
+    final note = store.fetchNote(widget.noteId);
+
+    titleController.text = note.title;
+    descriptionController.text = note.description;
+    
 
     return Scaffold(
       backgroundColor: Color(0xff252525),
@@ -56,7 +61,7 @@ class _EditNoteState extends State<EditNote> {
                     ),
                   ),
                   onPressed: () {
-                    store.editNote(widget.note, titleController.text, descriptionController.text);
+                    store.editNote(note, titleController.text, descriptionController.text);
                     Navigator.of(context).pop();
                   },
                   style: ElevatedButton.styleFrom(

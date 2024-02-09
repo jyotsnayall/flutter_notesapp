@@ -55,7 +55,8 @@ class NoteDetails extends StatelessWidget {
                               onPressed: () {
                                 Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
-                                    builder: (context) => EditNote(note: note),
+                                    // builder: (context) => EditNote(note: note),
+                                    builder: (context) => EditNote(noteId: note.id),
                                   ),
                                 );
                               },

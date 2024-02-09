@@ -19,17 +19,20 @@ class NotesModelAdapter extends TypeAdapter<_NotesModel> {
     return NotesModel(
       title: fields[0] as String,
       description: fields[1] as String,
+      id: fields[2] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, _NotesModel obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
-      ..write(obj.description);
+      ..write(obj.description)
+      ..writeByte(2)
+      ..write(obj.id);
   }
 
   @override
@@ -81,6 +84,21 @@ mixin _$NotesModel on _NotesModel, Store {
     });
   }
 
+  late final _$idAtom = Atom(name: '_NotesModel.id', context: context);
+
+  @override
+  String get id {
+    _$idAtom.reportRead();
+    return super.id;
+  }
+
+  @override
+  set id(String value) {
+    _$idAtom.reportWrite(value, super.id, () {
+      super.id = value;
+    });
+  }
+
   late final _$_NotesModelActionController =
       ActionController(name: '_NotesModel', context: context);
 
@@ -110,7 +128,8 @@ mixin _$NotesModel on _NotesModel, Store {
   String toString() {
     return '''
 title: ${title},
-description: ${description}
+description: ${description},
+id: ${id}
     ''';
   }
 }

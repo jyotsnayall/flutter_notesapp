@@ -98,11 +98,33 @@ mixin _$NotesStore on _NotesStore, Store {
   }
 
   @override
-  void addNote(String title, String description) {
+  void addNote(String id, String title, String description) {
     final _$actionInfo =
         _$_NotesStoreActionController.startAction(name: '_NotesStore.addNote');
     try {
-      return super.addNote(title, description);
+      return super.addNote(id, title, description);
+    } finally {
+      _$_NotesStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void clearNotes() {
+    final _$actionInfo = _$_NotesStoreActionController.startAction(
+        name: '_NotesStore.clearNotes');
+    try {
+      return super.clearNotes();
+    } finally {
+      _$_NotesStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  NotesModel fetchNote(String noteId) {
+    final _$actionInfo = _$_NotesStoreActionController.startAction(
+        name: '_NotesStore.fetchNote');
+    try {
+      return super.fetchNote(noteId);
     } finally {
       _$_NotesStoreActionController.endAction(_$actionInfo);
     }

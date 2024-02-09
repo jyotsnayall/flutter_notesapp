@@ -6,6 +6,7 @@ import 'package:notesapp/screens/edit_note_screen.dart';
 import 'package:notesapp/screens/note_details_screen.dart';
 import 'package:notesapp/stores/notes_store.dart';
 import 'package:notesapp/widgets/main_drawer.dart';
+import 'package:uuid/uuid.dart';
 
 final NotesStore store = NotesStore();
 
@@ -216,6 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             TextButton(
               onPressed: () {
+                print('outside fn ID: ${note.id}');
                 store.editNote(
                     note, titleController.text, descriptionController.text);
 
@@ -283,7 +285,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 // box.add(data);
 
                 // data.save();
-                store.addNote(titleController.text, descriptionController.text);
+                final id = Uuid().v1();
+                store.addNote(id, titleController.text, descriptionController.text);
                 titleController.clear();
                 descriptionController.clear();
 
