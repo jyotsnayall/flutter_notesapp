@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:notesapp/models/notes_model.dart';
 import 'package:notesapp/screens/edit_note_screen.dart';
 import 'package:notesapp/screens/home_screen.dart';
 import 'package:notesapp/stores/notes_store.dart';
 import 'package:uuid/uuid.dart';
-
-final NotesStore store = NotesStore();
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key});
@@ -62,15 +59,25 @@ class MainDrawer extends StatelessWidget {
               ),
               onTap: () {
                 final id = Uuid().v1();
-                final note = NotesModel(
-                  id: id,
-                  title: '',
-                  description: '',
-                );
                 store.addNote(id, '', '');
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => EditNote(noteId: note.id)),
+                  MaterialPageRoute(builder: (_) => EditNote(noteId: id)),
                 );
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.delete_forever,
+                color: Colors.white,
+              ),
+              title: Text(
+                'Clear all notes',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              onTap: () {
+                store.clearNotes();
               },
             ),
           ],

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:notesapp/models/notes_model.dart';
 import 'package:notesapp/stores/notes_store.dart';
-
-final NotesStore store = NotesStore();
 
 class EditNote extends StatefulWidget {
   // final NotesModel note;
@@ -32,10 +29,10 @@ class _EditNoteState extends State<EditNote> {
   @override
   Widget build(BuildContext context) {
     final note = store.fetchNote(widget.noteId);
+    print('ID in edit note screen: ${note.id}');
 
     titleController.text = note.title;
     descriptionController.text = note.description;
-    
 
     return Scaffold(
       backgroundColor: Color(0xff252525),
@@ -46,7 +43,7 @@ class _EditNoteState extends State<EditNote> {
           Padding(
             padding: const EdgeInsets.only(left: 8.0, right: 10, top: 10),
             child: Observer(
-              builder: (_) {
+              builder: (context) {
                 return ElevatedButton(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -61,7 +58,8 @@ class _EditNoteState extends State<EditNote> {
                     ),
                   ),
                   onPressed: () {
-                    store.editNote(note, titleController.text, descriptionController.text);
+                    store.editNote(
+                        note, titleController.text, descriptionController.text);
                     Navigator.of(context).pop();
                   },
                   style: ElevatedButton.styleFrom(
@@ -83,31 +81,31 @@ class _EditNoteState extends State<EditNote> {
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 10.0, right: 10),
-                  child: TextField(
-                    maxLines: null,
-                    textCapitalization: TextCapitalization.none,
-                    keyboardType: TextInputType.visiblePassword,
-                    style: TextStyle(
-                      color: Colors.white,
+              Padding(
+                padding: const EdgeInsets.only(left: 10.0, right: 10),
+                child: TextField(
+                  maxLines: null,
+                  textCapitalization: TextCapitalization.none,
+                  keyboardType: TextInputType.visiblePassword,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    decoration: TextDecoration.none,
+                  ),
+                  controller: titleController,
+                  cursorColor: Colors.white,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: "Title",
+                    hintStyle: TextStyle(
+                      color: Color(0xff929292),
                       fontSize: 30,
-                      decoration: TextDecoration.none,
-                    ),
-                    controller: titleController,
-                    cursorColor: Colors.white,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Title",
-                      hintStyle: TextStyle(
-                        color: Color(0xff929292),
-                        fontSize: 30,
-                        letterSpacing: 1.5,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      letterSpacing: 1.5,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                 ),
+              ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),

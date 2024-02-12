@@ -24,6 +24,22 @@ mixin _$NotesStore on _NotesStore, Store {
     });
   }
 
+  late final _$pinnedNotesAtom =
+      Atom(name: '_NotesStore.pinnedNotes', context: context);
+
+  @override
+  List<NotesModel> get pinnedNotes {
+    _$pinnedNotesAtom.reportRead();
+    return super.pinnedNotes;
+  }
+
+  @override
+  set pinnedNotes(List<NotesModel> value) {
+    _$pinnedNotesAtom.reportWrite(value, super.pinnedNotes, () {
+      super.pinnedNotes = value;
+    });
+  }
+
   late final _$initHiveDBAtom =
       Atom(name: '_NotesStore.initHiveDB', context: context);
 
@@ -64,6 +80,14 @@ mixin _$NotesStore on _NotesStore, Store {
   @override
   Future<void> init() {
     return _$initAsyncAction.run(() => super.init());
+  }
+
+  late final _$getBoxAsyncAction =
+      AsyncAction('_NotesStore.getBox', context: context);
+
+  @override
+  Future<void> getBox() {
+    return _$getBoxAsyncAction.run(() => super.getBox());
   }
 
   late final _$editNoteAsyncAction =
@@ -120,6 +144,17 @@ mixin _$NotesStore on _NotesStore, Store {
   }
 
   @override
+  void togglePin(NotesModel note) {
+    final _$actionInfo = _$_NotesStoreActionController.startAction(
+        name: '_NotesStore.togglePin');
+    try {
+      return super.togglePin(note);
+    } finally {
+      _$_NotesStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   NotesModel fetchNote(String noteId) {
     final _$actionInfo = _$_NotesStoreActionController.startAction(
         name: '_NotesStore.fetchNote');
@@ -134,6 +169,7 @@ mixin _$NotesStore on _NotesStore, Store {
   String toString() {
     return '''
 notes: ${notes},
+pinnedNotes: ${pinnedNotes},
 initHiveDB: ${initHiveDB},
 box: ${box}
     ''';

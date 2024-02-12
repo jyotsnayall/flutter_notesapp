@@ -4,11 +4,10 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:notesapp/models/notes_model.dart';
 import 'package:notesapp/screens/edit_note_screen.dart';
 import 'package:notesapp/screens/note_details_screen.dart';
+import 'package:notesapp/screens/search_screen.dart';
 import 'package:notesapp/stores/notes_store.dart';
 import 'package:notesapp/widgets/main_drawer.dart';
 import 'package:uuid/uuid.dart';
-
-final NotesStore store = NotesStore();
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
+  final searchController = TextEditingController();
 
   final List<Color> colors = [
     Color(0xFFFF8A80), // Red
@@ -46,29 +46,10 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Color(0xff252525),
       appBar: AppBar(
         title: const Text(
-          'Notes App',
+          'Your Notes',
           style: TextStyle(
-            color: Colors.white,
-            fontSize: 25,
-          ),
+              color: Colors.white, fontSize: 25, fontWeight: FontWeight.w600),
         ),
-        // title: Padding(
-        //   padding: const EdgeInsets.only(right: 15, top: 10),
-        //   child: Container(
-        //     color: Color.fromARGB(255, 68, 68, 68),
-        //     width: MediaQuery.of(context).size.width,
-        //     child: Padding(
-        //       padding: const EdgeInsets.all(10.0),
-        //       child: Text(
-        //         'Notes App',
-        //         style: TextStyle(
-        //           color: Colors.white,
-        //           fontSize: 25,
-        //         ),
-        //       ),
-        //     ),
-        //   ),
-        // ),
         backgroundColor: Color(0xff252525),
         iconTheme: IconThemeData(color: Colors.white),
       ),
@@ -81,94 +62,245 @@ class _HomeScreenState extends State<HomeScreen> {
               child: CircularProgressIndicator(),
             );
           }
-          return Padding(
-            padding: EdgeInsets.only(top: 16.0),
-            child: MasonryGridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-              itemCount: store.notes.length,
-              itemBuilder: (BuildContext context, int index) {
-                final note = store.notes[index];
-                final color = colors[index % colors.length];
-                return InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => NoteDetails(note: note),
-                      ),
-                    );
-                  },
-                  child: Card(
-                    color: color,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  note.title,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              InkWell(
-                                child: Icon(Icons.delete, color: Colors.red),
-                                onTap: () {
-                                  store.removeNote(note);
-                                },
-                              ),
-                              SizedBox(width: 10),
-                              InkWell(
-                                onTap: () {
-                                  _editDialog(
-                                    note,
-                                    note.title.toString(),
-                                    note.description.toString(),
-                                  );
-                                  // Navigator.of(context).push(
-                                  //   MaterialPageRoute(
-                                  //     builder: (context) =>
-                                  //         EditNote(note: note),
-                                  //   ),
-                                  // );
-                                },
-                                child: Icon(
-                                  Icons.edit,
-                                  color: const Color.fromARGB(207, 0, 0, 0),
-                                ),
-                              ),
-                            ],
+          return SafeArea(
+            child: Column(
+              children: [
+                // SingleChildScrollView(
+                Container(
+                  margin: const EdgeInsets.all(10),
+                  width: MediaQuery.of(context).size.width - 20,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Color.fromARGB(255, 68, 68, 68),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => SearchView(),
                           ),
-                          SizedBox(height: 8),
+                        );
+                      },
+                      child: Row(
+                        children: [
                           Text(
-                            note.description,
-                            style: TextStyle(fontSize: 14),
-                            maxLines: 8,
-                            overflow: TextOverflow.ellipsis,
+                            'Search your notes...',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                            ),
+                          ),
+                          Spacer(),
+                          IconButton(
+                            icon: Icon(Icons.search),
+                            color: Colors.white,
+                            onPressed: () {},
                           ),
                         ],
                       ),
                     ),
                   ),
-                );
-              },
+                ),
+                // ),
+                if (store.pinnedNotes.isNotEmpty)
+                  Text(
+                    "PINNED",
+                    style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold),
+                  ),
+                notesGridView(store.pinnedNotes),
+                Text(
+                  "OTHERS",
+                  style: TextStyle(
+                      color: Colors.white.withOpacity(0.7),
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold),
+                ),
+                notesGridView(store.notes),
+              ],
             ),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showMyDialog();
+          // _showMyDialog();
+          final id = Uuid().v1();
+          store.addNote(id, '', '');
+          print('ID on home screen: $id');
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => EditNote(noteId: id)),
+          );
         },
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget notesGridView(List<NotesModel> notes) {
+    return Flexible(
+      child: Padding(
+        padding: EdgeInsets.only(top: 16.0),
+        child: MasonryGridView.count(
+          crossAxisCount: 2,
+          mainAxisSpacing: 4,
+          crossAxisSpacing: 4,
+          scrollDirection: Axis.vertical,
+          itemCount: notes.length,
+          itemBuilder: (BuildContext context, int index) {
+            final note = notes[index];
+            final color = colors[index % colors.length];
+            return InkWell(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => NoteDetails(note: note),
+                  ),
+                );
+              },
+              child: Card(
+                color: color,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              note.title,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          InkWell(
+                            child: Icon(Icons.delete, color: Colors.red),
+                            onTap: () {
+                              store.removeNote(note);
+                            },
+                          ),
+                          SizedBox(width: 10),
+                          InkWell(
+                            onTap: () {
+                              _editDialog(
+                                note,
+                                note.title.toString(),
+                                note.description.toString(),
+                              );
+                              // Navigator.of(context).push(
+                              //   MaterialPageRoute(
+                              //     builder: (context) =>
+                              //         EditNote(note: note),
+                              //   ),
+                              // );
+                            },
+                            child: Icon(
+                              Icons.edit,
+                              color: const Color.fromARGB(207, 0, 0, 0),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        note.description,
+                        style: TextStyle(fontSize: 14),
+                        maxLines: 8,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget notesListView(List<NotesModel> notes) {
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.only(top: 16.0),
+        child: ListView.builder(
+          itemCount: store.notes.length,
+          itemBuilder: (BuildContext context, int index) {
+            final note = store.notes[index];
+            final color = colors[index % colors.length];
+            return InkWell(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => NoteDetails(note: note),
+                  ),
+                );
+              },
+              child: Card(
+                color: color,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              note.title,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          InkWell(
+                            child: Icon(Icons.delete, color: Colors.red),
+                            onTap: () {
+                              store.removeNote(note);
+                            },
+                          ),
+                          SizedBox(width: 10),
+                          InkWell(
+                            onTap: () {
+                              _editDialog(
+                                note,
+                                note.title.toString(),
+                                note.description.toString(),
+                              );
+                            },
+                            child: Icon(
+                              Icons.edit,
+                              color: const Color.fromARGB(207, 0, 0, 0),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        note.description,
+                        style: TextStyle(fontSize: 14),
+                        maxLines: 8,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -286,7 +418,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 // data.save();
                 final id = Uuid().v1();
-                store.addNote(id, titleController.text, descriptionController.text);
+                store.addNote(
+                    id, titleController.text, descriptionController.text);
                 titleController.clear();
                 descriptionController.clear();
 

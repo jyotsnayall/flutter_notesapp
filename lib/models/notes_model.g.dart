@@ -20,19 +20,22 @@ class NotesModelAdapter extends TypeAdapter<_NotesModel> {
       title: fields[0] as String,
       description: fields[1] as String,
       id: fields[2] as String,
+      isPinned: fields[3] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, _NotesModel obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
       ..write(obj.description)
       ..writeByte(2)
-      ..write(obj.id);
+      ..write(obj.id)
+      ..writeByte(3)
+      ..write(obj.isPinned);
   }
 
   @override
@@ -99,6 +102,22 @@ mixin _$NotesModel on _NotesModel, Store {
     });
   }
 
+  late final _$isPinnedAtom =
+      Atom(name: '_NotesModel.isPinned', context: context);
+
+  @override
+  bool get isPinned {
+    _$isPinnedAtom.reportRead();
+    return super.isPinned;
+  }
+
+  @override
+  set isPinned(bool value) {
+    _$isPinnedAtom.reportWrite(value, super.isPinned, () {
+      super.isPinned = value;
+    });
+  }
+
   late final _$_NotesModelActionController =
       ActionController(name: '_NotesModel', context: context);
 
@@ -129,7 +148,8 @@ mixin _$NotesModel on _NotesModel, Store {
     return '''
 title: ${title},
 description: ${description},
-id: ${id}
+id: ${id},
+isPinned: ${isPinned}
     ''';
   }
 }

@@ -19,7 +19,12 @@ abstract class _NotesModel extends HiveObject with Store {
   @observable
   String id;
 
-  _NotesModel({required this.title, required this.description, required this.id});
+  @HiveField(3)
+  @observable
+  bool isPinned;
+
+  _NotesModel({required this.title, required this.description, required this.id, required this.isPinned});
+
 
   @action
   void setTitle(String value) => title = value;
