@@ -16,6 +16,9 @@ abstract class _NotesStore with Store {
   List<NotesModel> pinnedNotes = ObservableList<NotesModel>();
 
   @observable
+  List<NotesModel> searchResultNotes = ObservableList<NotesModel>();
+
+  @observable
   bool initHiveDB = false;
 
   @observable
@@ -153,6 +156,43 @@ abstract class _NotesStore with Store {
       print('Error fetching note: $e');
       throw Exception('Error fetching note: $e');
     }
+  }
+
+  @action
+  void clearSearch() {
+    searchResultNotes.clear();
+  }
+
+  @action
+  void search(String query) {
+    clearSearch();
+
+    // Search in notes
+    for (var note in notes) {
+      if (note.title.contains(query) || note.description.contains(query)) {
+        searchResultNotes.add(note);
+      }
+    }
+
+    // Search in pinnedNotes
+    for (var note in pinnedNotes) {
+      if (note.title.contains(query) || note.description.contains(query)) {
+        searchResultNotes.add(note);
+      }
+    }
+
+    // final ResultIds =
+    //     await NotesDatabse.instance.getNoteString(query); //= [1,2,3,4,5]
+    // List<Note?> SearchResultNotesLocal = []; //[nOTE1, nOTE2]
+    // ResultIds.forEach(
+    //   (element) async {
+    //     final SearchNote = await NotesDatabse.instance.readOneNote(element);
+    //     SearchResultNotesLocal.add(SearchNote);
+
+    //         searchResultNotes.add(SearchNote);
+    //     );
+    //   },
+    // );
   }
 }
 

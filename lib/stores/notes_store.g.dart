@@ -40,6 +40,22 @@ mixin _$NotesStore on _NotesStore, Store {
     });
   }
 
+  late final _$searchResultNotesAtom =
+      Atom(name: '_NotesStore.searchResultNotes', context: context);
+
+  @override
+  List<NotesModel> get searchResultNotes {
+    _$searchResultNotesAtom.reportRead();
+    return super.searchResultNotes;
+  }
+
+  @override
+  set searchResultNotes(List<NotesModel> value) {
+    _$searchResultNotesAtom.reportWrite(value, super.searchResultNotes, () {
+      super.searchResultNotes = value;
+    });
+  }
+
   late final _$initHiveDBAtom =
       Atom(name: '_NotesStore.initHiveDB', context: context);
 
@@ -166,10 +182,33 @@ mixin _$NotesStore on _NotesStore, Store {
   }
 
   @override
+  void clearSearch() {
+    final _$actionInfo = _$_NotesStoreActionController.startAction(
+        name: '_NotesStore.clearSearch');
+    try {
+      return super.clearSearch();
+    } finally {
+      _$_NotesStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void search(String query) {
+    final _$actionInfo =
+        _$_NotesStoreActionController.startAction(name: '_NotesStore.search');
+    try {
+      return super.search(query);
+    } finally {
+      _$_NotesStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 notes: ${notes},
 pinnedNotes: ${pinnedNotes},
+searchResultNotes: ${searchResultNotes},
 initHiveDB: ${initHiveDB},
 box: ${box}
     ''';

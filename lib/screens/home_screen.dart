@@ -77,6 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.all(10.0),
                     child: GestureDetector(
                       onTap: () {
+                        store.clearSearch();
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => SearchView(),
@@ -105,20 +106,33 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 // ),
                 if (store.pinnedNotes.isNotEmpty)
-                  Text(
-                    "PINNED",
-                    style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "PINNED",
+                        style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
-                notesGridView(store.pinnedNotes),
-                Text(
-                  "OTHERS",
-                  style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold),
+                if (store.pinnedNotes.isNotEmpty)
+                  notesGridView(store.pinnedNotes),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "OTHERS",
+                      style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
                 notesGridView(store.notes),
               ],
@@ -141,10 +155,91 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+//   Widget notesStaggeredView(List<NotesModel> notes) {
+//   return Flexible(
+//     child: Padding(
+//       padding: EdgeInsets.only(top: 8),
+//       child: StaggeredGrid.countBuilder(
+//         crossAxisCount: 2,
+//         itemCount: notes.length,
+//         itemBuilder: (BuildContext context, int index) {
+//           final note = notes[index];
+//           final color = colors[index % colors.length];
+//           return InkWell(
+//             onTap: () {
+//               Navigator.of(context).push(
+//                 MaterialPageRoute(
+//                   builder: (context) => NoteDetails(note: note),
+//                 ),
+//               );
+//             },
+//             child: Card(
+//               color: color,
+//               child: Padding(
+//                 padding: const EdgeInsets.all(8.0),
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Row(
+//                       children: [
+//                         Expanded(
+//                           child: Text(
+//                             note.title,
+//                             style: TextStyle(
+//                               fontSize: 18,
+//                               fontWeight: FontWeight.bold,
+//                             ),
+//                             maxLines: 2,
+//                             overflow: TextOverflow.ellipsis,
+//                           ),
+//                         ),
+//                         InkWell(
+//                           child: Icon(Icons.delete, color: Colors.red),
+//                           onTap: () {
+//                             store.removeNote(note);
+//                           },
+//                         ),
+//                         SizedBox(width: 10),
+//                         InkWell(
+//                           onTap: () {
+//                             _editDialog(
+//                               note,
+//                               note.title.toString(),
+//                               note.description.toString(),
+//                             );
+//                           },
+//                           child: Icon(
+//                             Icons.edit,
+//                             color: const Color.fromARGB(207, 0, 0, 0),
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                     SizedBox(height: 8),
+//                     Text(
+//                       note.description,
+//                       style: TextStyle(fontSize: 14),
+//                       maxLines: 8,
+//                       overflow: TextOverflow.ellipsis,
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//           );
+//         },
+//         staggeredTileBuilder: (int index) => StaggeredTile.fit(1),
+//         mainAxisSpacing: 4.0,
+//         crossAxisSpacing: 4.0,
+//       ),
+//     ),
+//   );
+// }
+
   Widget notesGridView(List<NotesModel> notes) {
     return Flexible(
       child: Padding(
-        padding: EdgeInsets.only(top: 16.0),
+        padding: EdgeInsets.only(top: 8),
         child: MasonryGridView.count(
           crossAxisCount: 2,
           mainAxisSpacing: 4,
@@ -231,7 +326,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget notesListView(List<NotesModel> notes) {
     return Expanded(
       child: Padding(
-        padding: EdgeInsets.only(top: 16.0),
+        padding: EdgeInsets.only(top: 8),
         child: ListView.builder(
           itemCount: store.notes.length,
           itemBuilder: (BuildContext context, int index) {
