@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:notesapp/screens/edit_note_screen.dart';
 import 'package:notesapp/screens/home_screen.dart';
+import 'package:notesapp/screens/login_screen.dart';
+import 'package:notesapp/services/auth.dart';
 import 'package:notesapp/stores/notes_store.dart';
 import 'package:uuid/uuid.dart';
 
@@ -78,6 +80,25 @@ class MainDrawer extends StatelessWidget {
               ),
               onTap: () {
                 store.clearNotes();
+              },
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(
+                Icons.logout,
+                color: Colors.white,
+              ),
+              title: Text(
+                'Sign Out',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              onTap: () {
+                // store.clearNotes();
+                signOut();
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()));
               },
             ),
           ],

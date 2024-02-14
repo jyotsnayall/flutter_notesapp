@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:hive/hive.dart';
 import 'package:mobx/mobx.dart';
 import 'package:uuid/uuid.dart';
@@ -23,6 +26,15 @@ abstract class _NotesStore with Store {
 
   @observable
   late Box<NotesModel> box;
+
+  @observable
+  bool isLoggedin = false;
+
+  // CollectionReference collectionRef =
+  //     FirebaseFirestore.instance.collection('notes');
+
+  // @observable
+  // late QuerySnapshot querySnapshot;
 
   var uuid = Uuid();
 
@@ -58,6 +70,36 @@ abstract class _NotesStore with Store {
       box = await Hive.openBox<NotesModel>('notes');
     }
   }
+
+  // @action
+  // Future<void> getSnapshot() async {
+  //   querySnapshot = await collectionRef.get();
+  // }
+
+  // @action
+  // Future<void> getNotes() async {
+  //   getSnapshot();
+
+  //   // notes = querySnapshot.docs
+  //   //     .map((e) => NotesModel(
+  //   //         id: e.id,
+  //   //         title: e['title'],
+  //   //         description: e['description'],
+  //   //         isPinned: e['isPinned']))
+  //   //     .toList()
+  //   //     .cast<NotesModel>();
+
+  //   notes = querySnapshot.docs
+  //       .map((docs) => docs.data())
+  //       .toList()
+  //       .cast<NotesModel>();
+
+  //     getBox();
+  //   pinnedNotes = box.values
+  //       .where((element) => element.isPinned == true)
+  //       .toList()
+  //       .cast<NotesModel>();
+  // }
 
   @action
   void getNotes() {

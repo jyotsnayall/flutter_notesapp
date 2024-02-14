@@ -45,3 +45,5 @@ app.*.map.json
 lib/screens/home_screen mob.dart
 lib/screens/home_screen--og.dart
 lib/main_copy.dart
+
+android/app/google-services.json
