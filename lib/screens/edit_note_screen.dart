@@ -20,6 +20,8 @@ class _EditNoteState extends State<EditNote> {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
 
+  late NotesModel note;
+
   // @override
   // void dispose() {
   //   titleController.dispose();
@@ -29,11 +31,12 @@ class _EditNoteState extends State<EditNote> {
 
   @override
   Widget build(BuildContext context) {
-    final NotesModel note = store.notes.firstWhere((element) => element.id == widget.noteId);
-    print('ID in edit note screen: ${note.id}');
-
-    titleController.text = note.title;
-    descriptionController.text = note.description;
+    final Future<NotesModel> fetchedNote = store.fetchNote(widget.noteId);
+    fetchedNote.then((value) {
+      titleController.text = value.title;
+      descriptionController.text = value.description;
+      note = value;
+    });
 
     return Scaffold(
       backgroundColor: Color(0xff252525),
@@ -43,37 +46,35 @@ class _EditNoteState extends State<EditNote> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(left: 8.0, right: 10, top: 10),
-            child: Observer(
-              builder: (context) {
-                return ElevatedButton(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Save",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.5,
-                      ),
+            child: Observer(builder: (context) {
+              return ElevatedButton(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Save",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.5,
                     ),
                   ),
-                  onPressed: () {
-                    store.editNote(
-                        note, titleController.text, descriptionController.text);
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.all(5),
-                    backgroundColor: Color(0xff3B3B3B),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                ),
+                onPressed: () {
+                  store.editNote(
+                      note, titleController.text, descriptionController.text);
+                  Navigator.of(context).pop();
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.all(5),
+                  backgroundColor: Color(0xff3B3B3B),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                );
-              }
-            ),
+                ),
+              );
+            }),
           ),
         ],
       ),

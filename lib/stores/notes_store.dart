@@ -229,31 +229,6 @@ abstract class _NotesStore with Store {
   // }
 
   @action
-  void getNotes() {
-    // getBox();
-    // // notes = box.values.toList().cast<NotesModel>();
-    // notes = box.values
-    //     .where((element) => !element.isPinned)
-    //     .toList()
-    //     .cast<NotesModel>();
-    // pinnedNotes = box.values
-    //     .where((element) => element.isPinned == true)
-    //     .toList()
-    //     .cast<NotesModel>();
-  }
-
-  @action
-  void addNote(final String id, final String title, final String description) {
-    // final note = NotesModel(
-    //     id: id, title: title, description: description, isPinned: false);
-    // print('ID in add note: $id');
-
-    // getBox();
-    // box.add(note);
-    // getNotes();
-  }
-
-  @action
   void clearNotes() {
     // box.clear();
     getNotesFromFirebase();
@@ -275,21 +250,8 @@ abstract class _NotesStore with Store {
     getNotesFromFirebase();
   }
 
-  // @action
-  // NotesModel fetchNote(String noteId) {
-  //   try {
-  //     final NotesModel note =
-  //         box.values.firstWhere((element) => element.id == noteId);
-  //     print(note.title + '\n' + note.description);
-  //     return note;
-  //   } catch (e) {
-  //     print('Error fetching note: $e');
-  //     throw Exception('Error fetching note: $e');
-  //   }
-  // }
-
   @action
-  Future<NotesModel> fetchNoteFromFirebase(String noteId) async {
+  Future<NotesModel> fetchNote(String noteId) async {
     getCurrentUser();
     final DocumentSnapshot document = await FirebaseFirestore.instance
         .collection('users')

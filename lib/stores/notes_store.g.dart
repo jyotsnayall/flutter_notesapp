@@ -196,13 +196,12 @@ mixin _$NotesStore on _NotesStore, Store {
     return _$togglePinAsyncAction.run(() => super.togglePin(note));
   }
 
-  late final _$fetchNoteFromFirebaseAsyncAction =
-      AsyncAction('_NotesStore.fetchNoteFromFirebase', context: context);
+  late final _$fetchNoteAsyncAction =
+      AsyncAction('_NotesStore.fetchNote', context: context);
 
   @override
-  Future<NotesModel> fetchNoteFromFirebase(String noteId) {
-    return _$fetchNoteFromFirebaseAsyncAction
-        .run(() => super.fetchNoteFromFirebase(noteId));
+  Future<NotesModel> fetchNote(String noteId) {
+    return _$fetchNoteAsyncAction.run(() => super.fetchNote(noteId));
   }
 
   late final _$_NotesStoreActionController =
@@ -236,28 +235,6 @@ mixin _$NotesStore on _NotesStore, Store {
         name: '_NotesStore.addNoteToFirebase');
     try {
       return super.addNoteToFirebase(id, title, description);
-    } finally {
-      _$_NotesStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void getNotes() {
-    final _$actionInfo =
-        _$_NotesStoreActionController.startAction(name: '_NotesStore.getNotes');
-    try {
-      return super.getNotes();
-    } finally {
-      _$_NotesStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void addNote(String id, String title, String description) {
-    final _$actionInfo =
-        _$_NotesStoreActionController.startAction(name: '_NotesStore.addNote');
-    try {
-      return super.addNote(id, title, description);
     } finally {
       _$_NotesStoreActionController.endAction(_$actionInfo);
     }
