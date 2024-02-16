@@ -95,7 +95,7 @@ abstract class _NotesStore with Store {
         .where('isPinned', isEqualTo: false)
         .get()
         .then((QuerySnapshot querySnapshot) {
-      print('Fetched notes successfully');
+      print('=====================Fetched notes successfully=====================');
       querySnapshot.docs.forEach((doc) {
         print(doc['title']);
         print(doc['description']);
@@ -121,6 +121,7 @@ abstract class _NotesStore with Store {
         .where('isPinned', isEqualTo: true)
         .get()
         .then((QuerySnapshot querySnapshot) {
+          print("=====================Pinned Notes=====================");
       querySnapshot.docs.forEach((doc) {
         print(doc['title']);
         print(doc['description']);

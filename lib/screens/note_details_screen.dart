@@ -31,7 +31,7 @@ class NoteDetails extends StatelessWidget {
               onPressed: () {
                 store.togglePin(note);
                 print('Pinned: ${note.isPinned}');
-                Navigator.pop(context);
+                // Navigator.pop(context);
               },
               icon: Observer(
                 builder: (context) {
