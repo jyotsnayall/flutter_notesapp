@@ -56,19 +56,19 @@ mixin _$NotesStore on _NotesStore, Store {
     });
   }
 
-  late final _$initHiveDBAtom =
-      Atom(name: '_NotesStore.initHiveDB', context: context);
+  late final _$initFireDBAtom =
+      Atom(name: '_NotesStore.initFireDB', context: context);
 
   @override
-  bool get initHiveDB {
-    _$initHiveDBAtom.reportRead();
-    return super.initHiveDB;
+  bool get initFireDB {
+    _$initFireDBAtom.reportRead();
+    return super.initFireDB;
   }
 
   @override
-  set initHiveDB(bool value) {
-    _$initHiveDBAtom.reportWrite(value, super.initHiveDB, () {
-      super.initHiveDB = value;
+  set initFireDB(bool value) {
+    _$initFireDBAtom.reportWrite(value, super.initFireDB, () {
+      super.initFireDB = value;
     });
   }
 
@@ -90,6 +90,70 @@ mixin _$NotesStore on _NotesStore, Store {
     });
   }
 
+  late final _$isLoggedinAtom =
+      Atom(name: '_NotesStore.isLoggedin', context: context);
+
+  @override
+  bool get isLoggedin {
+    _$isLoggedinAtom.reportRead();
+    return super.isLoggedin;
+  }
+
+  @override
+  set isLoggedin(bool value) {
+    _$isLoggedinAtom.reportWrite(value, super.isLoggedin, () {
+      super.isLoggedin = value;
+    });
+  }
+
+  late final _$current_userAtom =
+      Atom(name: '_NotesStore.current_user', context: context);
+
+  @override
+  User? get current_user {
+    _$current_userAtom.reportRead();
+    return super.current_user;
+  }
+
+  bool _current_userIsInitialized = false;
+
+  @override
+  set current_user(User? value) {
+    _$current_userAtom.reportWrite(
+        value, _current_userIsInitialized ? super.current_user : null, () {
+      super.current_user = value;
+      _current_userIsInitialized = true;
+    });
+  }
+
+  late final _$collectionRefAtom =
+      Atom(name: '_NotesStore.collectionRef', context: context);
+
+  @override
+  CollectionReference<Object?> get collectionRef {
+    _$collectionRefAtom.reportRead();
+    return super.collectionRef;
+  }
+
+  bool _collectionRefIsInitialized = false;
+
+  @override
+  set collectionRef(CollectionReference<Object?> value) {
+    _$collectionRefAtom.reportWrite(
+        value, _collectionRefIsInitialized ? super.collectionRef : null, () {
+      super.collectionRef = value;
+      _collectionRefIsInitialized = true;
+    });
+  }
+
+  late final _$initFirebaseAsyncAction =
+      AsyncAction('_NotesStore.initFirebase', context: context);
+
+  @override
+  Future<void> initFirebase() {
+    return _$initFirebaseAsyncAction.run(() => super.initFirebase());
+  }
+
   late final _$initAsyncAction =
       AsyncAction('_NotesStore.init', context: context);
 
@@ -98,12 +162,13 @@ mixin _$NotesStore on _NotesStore, Store {
     return _$initAsyncAction.run(() => super.init());
   }
 
-  late final _$getBoxAsyncAction =
-      AsyncAction('_NotesStore.getBox', context: context);
+  late final _$getNotesFromFirebaseAsyncAction =
+      AsyncAction('_NotesStore.getNotesFromFirebase', context: context);
 
   @override
-  Future<void> getBox() {
-    return _$getBoxAsyncAction.run(() => super.getBox());
+  Future<void> getNotesFromFirebase() {
+    return _$getNotesFromFirebaseAsyncAction
+        .run(() => super.getNotesFromFirebase());
   }
 
   late final _$editNoteAsyncAction =
@@ -123,8 +188,58 @@ mixin _$NotesStore on _NotesStore, Store {
     return _$removeNoteAsyncAction.run(() => super.removeNote(note));
   }
 
+  late final _$togglePinAsyncAction =
+      AsyncAction('_NotesStore.togglePin', context: context);
+
+  @override
+  Future<void> togglePin(NotesModel note) {
+    return _$togglePinAsyncAction.run(() => super.togglePin(note));
+  }
+
+  late final _$fetchNoteFromFirebaseAsyncAction =
+      AsyncAction('_NotesStore.fetchNoteFromFirebase', context: context);
+
+  @override
+  Future<NotesModel> fetchNoteFromFirebase(String noteId) {
+    return _$fetchNoteFromFirebaseAsyncAction
+        .run(() => super.fetchNoteFromFirebase(noteId));
+  }
+
   late final _$_NotesStoreActionController =
       ActionController(name: '_NotesStore', context: context);
+
+  @override
+  void getCurrentUser() {
+    final _$actionInfo = _$_NotesStoreActionController.startAction(
+        name: '_NotesStore.getCurrentUser');
+    try {
+      return super.getCurrentUser();
+    } finally {
+      _$_NotesStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void getCollectionReference() {
+    final _$actionInfo = _$_NotesStoreActionController.startAction(
+        name: '_NotesStore.getCollectionReference');
+    try {
+      return super.getCollectionReference();
+    } finally {
+      _$_NotesStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void addNoteToFirebase(String id, String title, String description) {
+    final _$actionInfo = _$_NotesStoreActionController.startAction(
+        name: '_NotesStore.addNoteToFirebase');
+    try {
+      return super.addNoteToFirebase(id, title, description);
+    } finally {
+      _$_NotesStoreActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void getNotes() {
@@ -160,28 +275,6 @@ mixin _$NotesStore on _NotesStore, Store {
   }
 
   @override
-  void togglePin(NotesModel note) {
-    final _$actionInfo = _$_NotesStoreActionController.startAction(
-        name: '_NotesStore.togglePin');
-    try {
-      return super.togglePin(note);
-    } finally {
-      _$_NotesStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  NotesModel fetchNote(String noteId) {
-    final _$actionInfo = _$_NotesStoreActionController.startAction(
-        name: '_NotesStore.fetchNote');
-    try {
-      return super.fetchNote(noteId);
-    } finally {
-      _$_NotesStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void clearSearch() {
     final _$actionInfo = _$_NotesStoreActionController.startAction(
         name: '_NotesStore.clearSearch');
@@ -209,8 +302,11 @@ mixin _$NotesStore on _NotesStore, Store {
 notes: ${notes},
 pinnedNotes: ${pinnedNotes},
 searchResultNotes: ${searchResultNotes},
-initHiveDB: ${initHiveDB},
-box: ${box}
+initFireDB: ${initFireDB},
+box: ${box},
+isLoggedin: ${isLoggedin},
+current_user: ${current_user},
+collectionRef: ${collectionRef}
     ''';
   }
 }

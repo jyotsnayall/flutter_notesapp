@@ -5,9 +5,10 @@ import 'package:notesapp/screens/home_screen.dart';
 import 'package:notesapp/screens/login_screen.dart';
 import 'package:notesapp/stores/notes_store.dart';
 
-void main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  print('Firebase initialized');
   runApp(const MyApp());
 }
 

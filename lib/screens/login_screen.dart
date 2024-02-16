@@ -13,28 +13,37 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  // final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Login To App"),),
+      appBar: AppBar(
+        title: Text("Login To App"),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SignInButton(Buttons.Google, onPressed:() async{
-              await signInWithGoogle();
-              store.isLoggedin = true;
-              //  final User? currentUser = await _auth.currentUser;
-              //  LocalDataSaver.saveLoginData(true);
-              //  LocalDataSaver.saveImg(currentUser!.photoURL.toString());
-              //  LocalDataSaver.saveMail(currentUser.email.toString());
-              //  LocalDataSaver.saveName(currentUser.displayName.toString());
-              //  await FireDB().getAllStoredNotes();
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
-            })
+            SignInButton(
+              Buttons.Google,
+              onPressed: () async {
+                await signInWithGoogle();
+                store.isLoggedin = true;
+                //  final User? currentUser = await _auth.currentUser;
+                //  LocalDataSaver.saveLoginData(true);
+                //  LocalDataSaver.saveImg(currentUser!.photoURL.toString());
+                //  LocalDataSaver.saveMail(currentUser.email.toString());
+                //  LocalDataSaver.saveName(currentUser.displayName.toString());
+                //  await FireDB().getAllStoredNotes();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                );
+              },
+            ),
           ],
         ),
       ),
-    );;
+    );
   }
 }

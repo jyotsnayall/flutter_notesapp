@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:notesapp/models/notes_model.dart';
 import 'package:notesapp/stores/notes_store.dart';
 
 class EditNote extends StatefulWidget {
@@ -28,7 +29,7 @@ class _EditNoteState extends State<EditNote> {
 
   @override
   Widget build(BuildContext context) {
-    final note = store.fetchNote(widget.noteId);
+    final NotesModel note = store.notes.firstWhere((element) => element.id == widget.noteId);
     print('ID in edit note screen: ${note.id}');
 
     titleController.text = note.title;

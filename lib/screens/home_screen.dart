@@ -37,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    // store.initFirebase();
     store.init();
   }
 
@@ -57,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: MainDrawer(),
       body: Observer(
         builder: (context) {
-          if (!store.initHiveDB) {
+          if (!store.initFireDB) {
             return Center(
               child: CircularProgressIndicator(),
             );
@@ -142,13 +143,13 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // _showMyDialog();
-          final id = Uuid().v1();
-          store.addNote(id, '', '');
-          print('ID on home screen: $id');
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => EditNote(noteId: id)),
-          );
+          _showMyDialog();
+          // final id = Uuid().v1();
+          // store.addNote(id, '', '');
+          // print('ID on home screen: $id');
+          // Navigator.of(context).push(
+          //   MaterialPageRoute(builder: (_) => EditNote(noteId: id)),
+          // );
         },
         child: const Icon(Icons.add),
       ),
@@ -503,21 +504,10 @@ class _HomeScreenState extends State<HomeScreen> {
             TextButton(
               child: Text('Add'),
               onPressed: () {
-                // final data = NotesModel(
-                //   title: titleController.text,
-                //   description: descriptionController.text,
-                // );
-
-                // final box = Boxes.getNotes();
-                // box.add(data);
-
-                // data.save();
                 final id = Uuid().v1();
-                store.addNote(
-                    id, titleController.text, descriptionController.text);
+                store.addNoteToFirebase(id, titleController.text, descriptionController.text);
                 titleController.clear();
                 descriptionController.clear();
-
                 Navigator.pop(context);
               },
             ),

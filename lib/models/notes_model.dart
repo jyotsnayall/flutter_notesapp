@@ -5,21 +5,16 @@ part 'notes_model.g.dart';
 
 class NotesModel = _NotesModel with _$NotesModel;
 
-@HiveType(typeId: 0)
 abstract class _NotesModel extends HiveObject with Store {
-  @HiveField(0)
   @observable
   String title;
 
-  @HiveField(1)
   @observable
   String description;
 
-  @HiveField(2)
   @observable
   String id;
 
-  @HiveField(3)
   @observable
   bool isPinned;
 

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:notesapp/stores/notes_store.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -15,8 +16,9 @@ Future<User?> signInWithGoogle() async {
 
     //CREATING CREDENTIAL FOR FIREBASE
     final AuthCredential credential = GoogleAuthProvider.credential(
-        idToken: googleSignInAuthentication.idToken,
-        accessToken: googleSignInAuthentication.accessToken);
+      idToken: googleSignInAuthentication.idToken,
+      accessToken: googleSignInAuthentication.accessToken,
+    );
 
     //SIGNING IN WITH CREDENTIAL & MAKING A USER IN FIREBASE  AND GETTING USER CLASS
     final userCredential = await _auth.signInWithCredential(credential);
@@ -28,7 +30,11 @@ Future<User?> signInWithGoogle() async {
 
     final User? currentUser = await _auth.currentUser;
     assert(currentUser!.uid == user!.uid);
-    print(user);
+    print('User = ${user}');
+
+    store.notes.clear();
+    store.pinnedNotes.clear();
+
     return user;
   } catch (e) {
     print(e);
@@ -38,4 +44,6 @@ Future<User?> signInWithGoogle() async {
 void signOut() async {
   await googleSignIn.signOut();
   await _auth.signOut();
+  store.notes.clear();
+  store.pinnedNotes.clear();
 }

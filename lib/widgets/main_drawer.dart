@@ -61,7 +61,7 @@ class MainDrawer extends StatelessWidget {
               ),
               onTap: () {
                 final id = Uuid().v1();
-                store.addNote(id, '', '');
+                store.addNoteToFirebase(id, '', '');
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => EditNote(noteId: id)),
                 );

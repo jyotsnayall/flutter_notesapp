@@ -36,9 +36,9 @@ class NoteDetails extends StatelessWidget {
               icon: Observer(
                 builder: (context) {
                   return Icon(
-                    note.isPinned ? Icons.push_pin: Icons.push_pin_outlined,
+                    note.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
                   );
-                }
+                },
               ),
               color: Colors.white,
             ),

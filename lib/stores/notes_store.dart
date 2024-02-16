@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:mobx/mobx.dart';
 import 'package:uuid/uuid.dart';
 import '../models/notes_model.dart';
-import 'package:path_provider/path_provider.dart';
 
 part 'notes_store.g.dart';
 
@@ -22,7 +22,7 @@ abstract class _NotesStore with Store {
   List<NotesModel> searchResultNotes = ObservableList<NotesModel>();
 
   @observable
-  bool initHiveDB = false;
+  bool initFireDB = false;
 
   @observable
   late Box<NotesModel> box;
@@ -30,8 +30,11 @@ abstract class _NotesStore with Store {
   @observable
   bool isLoggedin = false;
 
-  // CollectionReference collectionRef =
-  //     FirebaseFirestore.instance.collection('notes');
+  @observable
+  late User? current_user;
+
+  @observable
+  late CollectionReference collectionRef;
 
   // @observable
   // late QuerySnapshot querySnapshot;
@@ -39,36 +42,160 @@ abstract class _NotesStore with Store {
   var uuid = Uuid();
 
   @action
-  Future<void> init() async {
-    var directory = await getApplicationDocumentsDirectory();
-    Hive.init(directory.path);
-    Hive.registerAdapter(NotesModelAdapter());
-    box = await Hive.openBox<NotesModel>('notes');
-    print('only opened box');
-    // notes = box.values.toList().cast<NotesModel>();
-    notes = box.values
-        .where((element) => !element.isPinned)
-        .toList()
-        .cast<NotesModel>();
-    pinnedNotes = box.values
-        .where((element) => element.isPinned == true)
-        .toList()
-        .cast<NotesModel>();
-    print("opened box and got notes");
-    for (var note in pinnedNotes) {
-      print(note.title);
-    }
-
-    initHiveDB = true;
+  Future<void> initFirebase() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
+    print('Firebase initialized');
   }
 
   @action
-  Future<void> getBox() async {
-    if (Hive.isBoxOpen('notes')) {
-      box = Hive.box<NotesModel>('notes');
-    } else {
-      box = await Hive.openBox<NotesModel>('notes');
+  Future<void> init() async {
+    getCurrentUser();
+    notes.clear();
+    pinnedNotes.clear();
+    getNotesFromFirebase();
+
+    print("fetched notes from firebase");
+    for (var note in notes) {
+      print(note.title);
     }
+
+    initFireDB = true;
+  }
+
+  @action
+  void getCurrentUser() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      current_user = user;
+      isLoggedin = true;
+    } else {
+      isLoggedin = false;
+    }
+  }
+
+  @action
+  void getCollectionReference() {
+    getCurrentUser();
+    collectionRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(current_user!.email)
+        .collection('notes');
+  }
+
+  @action
+  Future<void> getNotesFromFirebase() async {
+    getCurrentUser();
+    notes.clear();
+    pinnedNotes.clear();
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(current_user!.email)
+        .collection('notes')
+        .where('isPinned', isEqualTo: false)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      print('Fetched notes successfully');
+      querySnapshot.docs.forEach((doc) {
+        print(doc['title']);
+        print(doc['description']);
+        print(doc['id']);
+        print(doc['isPinned']);
+
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        final note = NotesModel(
+            id: data['id'],
+            title: data['title'],
+            description: data['description'],
+            isPinned: data['isPinned']);
+
+        notes.add(note);
+      });
+    });
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(current_user!.email)
+        .collection('notes')
+        .where('isPinned', isEqualTo: true)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        print(doc['title']);
+        print(doc['description']);
+        print(doc['id']);
+        print(doc['isPinned']);
+
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        final note = NotesModel(
+            id: data['id'],
+            title: data['title'],
+            description: data['description'],
+            isPinned: data['isPinned']);
+
+        pinnedNotes.add(note);
+      });
+    });
+  }
+
+  @action
+  void addNoteToFirebase(
+      final String id, final String title, final String description) {
+    final note = NotesModel(
+        id: id, title: title, description: description, isPinned: false);
+    print('ID in add note: $id');
+
+    getCurrentUser();
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(current_user!.email)
+        .collection('notes')
+        .doc(note.id.toString())
+        .set({
+      'id': id,
+      'title': title,
+      'description': description,
+      'isPinned': note.isPinned
+    }).then((value) {
+      print('Note added to firebase');
+    });
+    getNotesFromFirebase();
+  }
+
+  @action
+  Future<void> editNote(final NotesModel note, final String title,
+      final String description) async {
+    getCurrentUser();
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(current_user!.email)
+        .collection('notes')
+        .doc(note.id)
+        .update({
+      'title': title,
+      'description': description,
+    }).then((value) {
+      print('Note updated in firebase');
+    });
+    getNotesFromFirebase();
+  }
+
+  @action
+  Future<void> removeNote(NotesModel note) async {
+    getCurrentUser();
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(current_user!.email)
+        .collection('notes')
+        .doc(note.id)
+        .delete()
+        .then((value) {
+      print('Note deleted from firebase');
+    });
+
+    getNotesFromFirebase();
   }
 
   // @action
@@ -103,100 +230,87 @@ abstract class _NotesStore with Store {
 
   @action
   void getNotes() {
-    getBox();
-    // notes = box.values.toList().cast<NotesModel>();
-    notes = box.values
-        .where((element) => !element.isPinned)
-        .toList()
-        .cast<NotesModel>();
-    pinnedNotes = box.values
-        .where((element) => element.isPinned == true)
-        .toList()
-        .cast<NotesModel>();
+    // getBox();
+    // // notes = box.values.toList().cast<NotesModel>();
+    // notes = box.values
+    //     .where((element) => !element.isPinned)
+    //     .toList()
+    //     .cast<NotesModel>();
+    // pinnedNotes = box.values
+    //     .where((element) => element.isPinned == true)
+    //     .toList()
+    //     .cast<NotesModel>();
   }
 
   @action
   void addNote(final String id, final String title, final String description) {
-    final note = NotesModel(
-        id: id, title: title, description: description, isPinned: false);
-    print('ID in add note: $id');
+    // final note = NotesModel(
+    //     id: id, title: title, description: description, isPinned: false);
+    // print('ID in add note: $id');
 
-    getBox();
-    box.add(note);
-    getNotes();
-  }
-
-  @action
-  Future<void> editNote(final NotesModel note, final String title,
-      final String description) async {
-    getBox();
-    var id = note.id;
-    var updatedNote = NotesModel(
-        id: id,
-        title: title,
-        description: description,
-        isPinned: note.isPinned);
-
-    print('ID in edit note: $id');
-    print('Note key = ' + note.key.toString());
-
-    await box.put(note.key, updatedNote);
-    final debugNotes = box.values.toList().cast<NotesModel>();
-    print('edited in box');
-    for (var note in debugNotes) {
-      print(note.title + note.id);
-    }
-    getNotes();
-    print('Now printing notes----');
-    for (var note in notes) {
-      print(note.title + note.id);
-    }
-  }
-
-  @action
-  Future<void> removeNote(NotesModel note) async {
-    final noteToRemove =
-        box.values.firstWhere((element) => element.id == note.id);
-
-    if (noteToRemove != null) {
-      await noteToRemove.delete();
-    }
-    getNotes();
+    // getBox();
+    // box.add(note);
+    // getNotes();
   }
 
   @action
   void clearNotes() {
-    box.clear();
-    getNotes();
+    // box.clear();
+    getNotesFromFirebase();
   }
 
   @action
-  void togglePin(NotesModel note) {
-    getBox();
-    // final noteToPin = box.values.firstWhere((element) => element.id == note.id);
-    // noteToPin.isPinned = !noteToPin.isPinned;
-    note.isPinned = !note.isPinned;
-    editNote(note, note.title, note.description);
-    getNotes();
+  Future<void> togglePin(NotesModel note) async {
+    getCurrentUser();
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(current_user!.email)
+        .collection('notes')
+        .doc(note.id)
+        .update({
+      'isPinned': !note.isPinned,
+    }).then((value) {
+      print('Note Pinned value changed in firebase');
+    });
+    getNotesFromFirebase();
   }
 
+  // @action
+  // NotesModel fetchNote(String noteId) {
+  //   try {
+  //     final NotesModel note =
+  //         box.values.firstWhere((element) => element.id == noteId);
+  //     print(note.title + '\n' + note.description);
+  //     return note;
+  //   } catch (e) {
+  //     print('Error fetching note: $e');
+  //     throw Exception('Error fetching note: $e');
+  //   }
+  // }
+
   @action
-  NotesModel fetchNote(String noteId) {
-    // final NotesModel note =
-    //     box.values.firstWhere((element) => element.id == noteId);
-    // print(note.title + '\n' + note.description);
-    // return note;
+  Future<NotesModel> fetchNoteFromFirebase(String noteId) async {
+    getCurrentUser();
+    final DocumentSnapshot document = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(current_user!.email)
+        .collection('notes')
+        .doc(noteId)
+        .get();
 
-    getBox();
+    if (document.exists) {
+      print('Document data: ${document.data()}');
 
-    try {
-      final NotesModel note =
-          box.values.firstWhere((element) => element.id == noteId);
-      print(note.title + '\n' + note.description);
+      final note = NotesModel(
+        id: document['id'],
+        title: document['title'],
+        description: document['description'],
+        isPinned: document['isPinned'],
+      );
       return note;
-    } catch (e) {
-      print('Error fetching note: $e');
-      throw Exception('Error fetching note: $e');
+    } else {
+      print('Document does not exist on the database');
+      throw Exception('Document does not exist on the database');
     }
   }
 
