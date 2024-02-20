@@ -47,4 +47,5 @@ lib/screens/home_screen--og.dart
 lib/main_copy.dart
 
 android/app/google-services.json
-firebase_options.dart
+lib/firebase_options.dart
+lib/screens/temp_screen.dart

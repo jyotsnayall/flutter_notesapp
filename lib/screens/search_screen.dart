@@ -116,7 +116,7 @@ class _SearchViewState extends State<SearchView> {
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => NoteDetails(note: note),
+                    builder: (context) => NoteDetails(note: notes[index]),
                   ),
                 );
               },
@@ -139,18 +139,20 @@ class _SearchViewState extends State<SearchView> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          IconButton(
-                            icon: Observer(builder: (context) {
-                              return Icon(
-                                note.isPinned
-                                    ? Icons.push_pin
-                                    : Icons.push_pin_outlined,
-                              );
-                            }),
-                            onPressed: () {
-                              store.togglePin(note);
-                            },
-                          ),
+                          // IconButton(
+                          //   icon: Observer(builder: (context) {
+                          //     return Icon(
+                          //       note.isPinned
+                          //           ? Icons.push_pin
+                          //           : Icons.push_pin_outlined,
+                          //     );
+                          //   }),
+                          //   onPressed: () {
+                          //     store.togglePin(note).then((value) => store.changeCounter++);
+                              
+                          //   },
+                          // ),
+                          Icon(note.isPinned?Icons.push_pin:Icons.push_pin_outlined)
                         ],
                       ),
                       SizedBox(height: 8),

@@ -72,24 +72,6 @@ mixin _$NotesStore on _NotesStore, Store {
     });
   }
 
-  late final _$boxAtom = Atom(name: '_NotesStore.box', context: context);
-
-  @override
-  Box<NotesModel> get box {
-    _$boxAtom.reportRead();
-    return super.box;
-  }
-
-  bool _boxIsInitialized = false;
-
-  @override
-  set box(Box<NotesModel> value) {
-    _$boxAtom.reportWrite(value, _boxIsInitialized ? super.box : null, () {
-      super.box = value;
-      _boxIsInitialized = true;
-    });
-  }
-
   late final _$isLoggedinAtom =
       Atom(name: '_NotesStore.isLoggedin', context: context);
 
@@ -146,6 +128,22 @@ mixin _$NotesStore on _NotesStore, Store {
     });
   }
 
+  late final _$changeCounterAtom =
+      Atom(name: '_NotesStore.changeCounter', context: context);
+
+  @override
+  int get changeCounter {
+    _$changeCounterAtom.reportRead();
+    return super.changeCounter;
+  }
+
+  @override
+  set changeCounter(int value) {
+    _$changeCounterAtom.reportWrite(value, super.changeCounter, () {
+      super.changeCounter = value;
+    });
+  }
+
   late final _$initFirebaseAsyncAction =
       AsyncAction('_NotesStore.initFirebase', context: context);
 
@@ -186,6 +184,14 @@ mixin _$NotesStore on _NotesStore, Store {
   @override
   Future<void> removeNote(NotesModel note) {
     return _$removeNoteAsyncAction.run(() => super.removeNote(note));
+  }
+
+  late final _$clearNotesAsyncAction =
+      AsyncAction('_NotesStore.clearNotes', context: context);
+
+  @override
+  Future<void> clearNotes() {
+    return _$clearNotesAsyncAction.run(() => super.clearNotes());
   }
 
   late final _$togglePinAsyncAction =
@@ -241,17 +247,6 @@ mixin _$NotesStore on _NotesStore, Store {
   }
 
   @override
-  void clearNotes() {
-    final _$actionInfo = _$_NotesStoreActionController.startAction(
-        name: '_NotesStore.clearNotes');
-    try {
-      return super.clearNotes();
-    } finally {
-      _$_NotesStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void clearSearch() {
     final _$actionInfo = _$_NotesStoreActionController.startAction(
         name: '_NotesStore.clearSearch');
@@ -280,10 +275,10 @@ notes: ${notes},
 pinnedNotes: ${pinnedNotes},
 searchResultNotes: ${searchResultNotes},
 initFireDB: ${initFireDB},
-box: ${box},
 isLoggedin: ${isLoggedin},
 current_user: ${current_user},
-collectionRef: ${collectionRef}
+collectionRef: ${collectionRef},
+changeCounter: ${changeCounter}
     ''';
   }
 }

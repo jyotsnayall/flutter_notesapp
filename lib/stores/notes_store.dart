@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:mobx/mobx.dart';
 import 'package:uuid/uuid.dart';
 import '../models/notes_model.dart';
@@ -25,9 +24,6 @@ abstract class _NotesStore with Store {
   bool initFireDB = false;
 
   @observable
-  late Box<NotesModel> box;
-
-  @observable
   bool isLoggedin = false;
 
   @observable
@@ -35,6 +31,9 @@ abstract class _NotesStore with Store {
 
   @observable
   late CollectionReference collectionRef;
+
+  @observable
+  int changeCounter = 0;
 
   // @observable
   // late QuerySnapshot querySnapshot;
@@ -50,7 +49,7 @@ abstract class _NotesStore with Store {
 
   @action
   Future<void> init() async {
-    getCurrentUser();
+    getCollectionReference();
     notes.clear();
     pinnedNotes.clear();
     getNotesFromFirebase();
@@ -85,17 +84,15 @@ abstract class _NotesStore with Store {
 
   @action
   Future<void> getNotesFromFirebase() async {
-    getCurrentUser();
+    getCollectionReference();
     notes.clear();
     pinnedNotes.clear();
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(current_user!.email)
-        .collection('notes')
+    await collectionRef
         .where('isPinned', isEqualTo: false)
         .get()
         .then((QuerySnapshot querySnapshot) {
-      print('=====================Fetched notes successfully=====================');
+      print(
+          '=====================Fetched notes successfully=====================');
       querySnapshot.docs.forEach((doc) {
         print(doc['title']);
         print(doc['description']);
@@ -114,14 +111,11 @@ abstract class _NotesStore with Store {
       });
     });
 
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(current_user!.email)
-        .collection('notes')
+    await collectionRef
         .where('isPinned', isEqualTo: true)
         .get()
         .then((QuerySnapshot querySnapshot) {
-          print("=====================Pinned Notes=====================");
+      print("=====================Pinned Notes=====================");
       querySnapshot.docs.forEach((doc) {
         print(doc['title']);
         print(doc['description']);
@@ -148,13 +142,8 @@ abstract class _NotesStore with Store {
         id: id, title: title, description: description, isPinned: false);
     print('ID in add note: $id');
 
-    getCurrentUser();
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(current_user!.email)
-        .collection('notes')
-        .doc(note.id.toString())
-        .set({
+    getCollectionReference();
+    collectionRef.doc(note.id.toString()).set({
       'id': id,
       'title': title,
       'description': description,
@@ -168,13 +157,8 @@ abstract class _NotesStore with Store {
   @action
   Future<void> editNote(final NotesModel note, final String title,
       final String description) async {
-    getCurrentUser();
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(current_user!.email)
-        .collection('notes')
-        .doc(note.id)
-        .update({
+    getCollectionReference();
+    await collectionRef.doc(note.id).update({
       'title': title,
       'description': description,
     }).then((value) {
@@ -185,14 +169,8 @@ abstract class _NotesStore with Store {
 
   @action
   Future<void> removeNote(NotesModel note) async {
-    getCurrentUser();
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(current_user!.email)
-        .collection('notes')
-        .doc(note.id)
-        .delete()
-        .then((value) {
+    getCollectionReference();
+    await collectionRef.doc(note.id).delete().then((value) {
       print('Note deleted from firebase');
     });
 
@@ -230,36 +208,40 @@ abstract class _NotesStore with Store {
   // }
 
   @action
-  void clearNotes() {
-    // box.clear();
+  Future<void> clearNotes() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(current_user!.email)
+          .collection('notes')
+          .get();
+
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        await doc.reference.delete();
+      }
+
+      print('All documents deleted successfully');
+    } catch (e) {
+      print('Error deleting documents: $e');
+    }
     getNotesFromFirebase();
   }
 
   @action
   Future<void> togglePin(NotesModel note) async {
-    getCurrentUser();
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(current_user!.email)
-        .collection('notes')
-        .doc(note.id)
-        .update({
+    getCollectionReference();
+    await collectionRef.doc(note.id).update({
       'isPinned': !note.isPinned,
     }).then((value) {
       print('Note Pinned value changed in firebase');
     });
-    getNotesFromFirebase();
+    await getNotesFromFirebase();
   }
 
   @action
   Future<NotesModel> fetchNote(String noteId) async {
-    getCurrentUser();
-    final DocumentSnapshot document = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(current_user!.email)
-        .collection('notes')
-        .doc(noteId)
-        .get();
+    getCollectionReference();
+    final DocumentSnapshot document = await collectionRef.doc(noteId).get();
 
     if (document.exists) {
       print('Document data: ${document.data()}');

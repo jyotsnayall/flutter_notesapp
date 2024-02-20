@@ -4,11 +4,9 @@ import 'package:notesapp/models/notes_model.dart';
 import 'package:notesapp/stores/notes_store.dart';
 
 class EditNote extends StatefulWidget {
-  // final NotesModel note;
   final String noteId;
   EditNote({
     super.key,
-    // required this.note,
     required this.noteId,
   });
 

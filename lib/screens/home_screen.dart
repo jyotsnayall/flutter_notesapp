@@ -143,13 +143,13 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showMyDialog();
-          // final id = Uuid().v1();
-          // store.addNote(id, '', '');
-          // print('ID on home screen: $id');
-          // Navigator.of(context).push(
-          //   MaterialPageRoute(builder: (_) => EditNote(noteId: id)),
-          // );
+          // _showMyDialog();
+          final id = Uuid().v1();
+          store.addNoteToFirebase(id, '', '');
+          print('ID on home screen: $id');
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => EditNote(noteId: id)),
+          );
         },
         child: const Icon(Icons.add),
       ),
@@ -254,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => NoteDetails(note: note),
+                    builder: (context) => NoteDetails(note: notes[index]),
                   ),
                 );
               },
@@ -281,7 +281,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           InkWell(
                             child: Icon(Icons.delete, color: Colors.red),
                             onTap: () {
-                              store.removeNote(note);
+                              // store.removeNote(note);
+                              _deleteDialog(note);
                             },
                           ),
                           SizedBox(width: 10),
@@ -455,6 +456,32 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.pop(context);
               },
               child: Text('Edit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteDialog(NotesModel note) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Are you sure?'),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text('Yes'),
+              onPressed: () {
+                store.removeNote(note);
+                Navigator.pop(context);
+              },
             ),
           ],
         );

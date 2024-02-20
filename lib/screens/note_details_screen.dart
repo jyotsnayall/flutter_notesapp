@@ -5,7 +5,7 @@ import 'package:notesapp/screens/edit_note_screen.dart';
 import 'package:notesapp/stores/notes_store.dart';
 
 class NoteDetails extends StatelessWidget {
-  final NotesModel note;
+  NotesModel note;
 
   NoteDetails({
     super.key,
@@ -19,6 +19,13 @@ class NoteDetails extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Color(0xff252525),
         iconTheme: IconThemeData(color: Colors.white),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.popUntil(context, (route) => route.isFirst);
+          },
+          icon: Icon(Icons.arrow_back),
+          color: Colors.white,
+        ),
         actions: [
           Container(
             height: 50,
@@ -28,13 +35,33 @@ class NoteDetails extends StatelessWidget {
             child: IconButton(
               splashColor: Colors.transparent,
               enableFeedback: true,
-              onPressed: () {
-                store.togglePin(note);
+              onPressed: () async {
+                print('List reference: ${note.hashCode} Before Pinning');
+                print("Button Pressed");
+                // await store.togglePin(note);
+
+                await store.togglePin(note).then((_) {
+                  // print('Pinned: ${note.isPinned} inside then');
+                  // print('List reference: ${note.hashCode} inside then');
+                  store.changeCounter++;
+                });
+
                 print('Pinned: ${note.isPinned}');
+                await store.fetchNote(note.id).then((value) {
+                  note = value;
+                  store.changeCounter++;
+                });
+                // store.changeCounter++;
+                // print('List reference: ${note.hashCode} After calling method');
+                // print('Pinned: ${note.isPinned}');
                 // Navigator.pop(context);
               },
               icon: Observer(
                 builder: (context) {
+                  print('Rebuilding Icon widget');
+                  // print('List reference: ${note.hashCode} inside Observer');
+                  print('changed: ${store.changeCounter}');
+                  print('note pin: ${note.isPinned}');
                   return Icon(
                     note.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
                   );

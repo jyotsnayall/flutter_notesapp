@@ -1,29 +1,29 @@
-import 'package:hive/hive.dart';
-import 'package:mobx/mobx.dart';
-
-part 'notes_model.g.dart';
-
-class NotesModel = _NotesModel with _$NotesModel;
-
-abstract class _NotesModel extends HiveObject with Store {
-  @observable
+class NotesModel {
   String title;
-
-  @observable
   String description;
-
-  @observable
   String id;
-
-  @observable
   bool isPinned;
 
-  _NotesModel({required this.title, required this.description, required this.id, required this.isPinned});
+  NotesModel({
+    required this.title,
+    required this.description,
+    required this.id,
+    required this.isPinned,
+  });
 
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
 
-  @action
-  void setTitle(String value) => title = value;
+    return other is NotesModel &&
+        other.title == title &&
+        other.description == description &&
+        other.id == id &&
+        other.isPinned == isPinned;
+  }
 
-  @action
-  void setDescription(String value) => description = value;
+  @override
+  int get hashCode {
+    return title.hashCode ^ description.hashCode ^ id.hashCode ^ isPinned.hashCode;
+  }
 }
