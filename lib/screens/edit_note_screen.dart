@@ -20,12 +20,12 @@ class _EditNoteState extends State<EditNote> {
 
   late NotesModel note;
 
-  // @override
-  // void dispose() {
-  //   titleController.dispose();
-  //   descriptionController.dispose();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -134,31 +134,6 @@ class _EditNoteState extends State<EditNote> {
                   ),
                 ),
               ),
-              // Padding(
-              //   padding: const EdgeInsets.all(10.0),
-              //   child: TextField(
-              //     maxLines: null,
-              //     textCapitalization: TextCapitalization.none,
-              //     keyboardType: TextInputType.visiblePassword,
-              //     style: TextStyle(
-              //       // fontSize: Theme.of(context).textTheme.headline4.fontSize,
-              //       color: Colors.white,
-              //       decoration: TextDecoration.none,
-              //     ),
-              //     controller: titleController,
-              //     cursorColor: Colors.white,
-              //     decoration: InputDecoration(
-              //       border: InputBorder.none,
-              //       hintText: "Title",
-              //       hintStyle: TextStyle(
-              //         color: Color(0xff929292),
-              //         // fontSize: Theme.of(context).textTheme.headline4.fontSize,
-              //         letterSpacing: 1.5,
-              //         fontWeight: FontWeight.w400,
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
         ),

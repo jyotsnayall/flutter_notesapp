@@ -18,11 +18,6 @@ class _SearchViewState extends State<SearchView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xff252525),
-      // appBar: AppBar(
-      //   title: Text('Search'),
-      //   backgroundColor: Color(0xff252525),
-      //   iconTheme: IconThemeData(color: Colors.white),
-      // ),
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(color: Colors.white.withOpacity(0.1)),
@@ -116,7 +111,7 @@ class _SearchViewState extends State<SearchView> {
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => NoteDetails(note: notes[index]),
+                    builder: (context) => NoteDetails(index: index),
                   ),
                 );
               },
@@ -139,19 +134,6 @@ class _SearchViewState extends State<SearchView> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          // IconButton(
-                          //   icon: Observer(builder: (context) {
-                          //     return Icon(
-                          //       note.isPinned
-                          //           ? Icons.push_pin
-                          //           : Icons.push_pin_outlined,
-                          //     );
-                          //   }),
-                          //   onPressed: () {
-                          //     store.togglePin(note).then((value) => store.changeCounter++);
-                              
-                          //   },
-                          // ),
                           Icon(note.isPinned?Icons.push_pin:Icons.push_pin_outlined)
                         ],
                       ),

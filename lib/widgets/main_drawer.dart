@@ -79,7 +79,34 @@ class MainDrawer extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                store.clearNotes();
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Confirm'),
+                      content:
+                          Text('Are you sure you want to clear all notes?'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text('Cancel'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: Text('Yes'),
+                          onPressed: () {
+                            store.clearNotes();
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(builder: (_) => HomeScreen()),
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
             ),
             Divider(),
@@ -95,7 +122,6 @@ class MainDrawer extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                // store.clearNotes();
                 signOut();
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (context) => LoginScreen()));

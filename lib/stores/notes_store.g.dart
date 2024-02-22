@@ -24,22 +24,6 @@ mixin _$NotesStore on _NotesStore, Store {
     });
   }
 
-  late final _$pinnedNotesAtom =
-      Atom(name: '_NotesStore.pinnedNotes', context: context);
-
-  @override
-  List<NotesModel> get pinnedNotes {
-    _$pinnedNotesAtom.reportRead();
-    return super.pinnedNotes;
-  }
-
-  @override
-  set pinnedNotes(List<NotesModel> value) {
-    _$pinnedNotesAtom.reportWrite(value, super.pinnedNotes, () {
-      super.pinnedNotes = value;
-    });
-  }
-
   late final _$searchResultNotesAtom =
       Atom(name: '_NotesStore.searchResultNotes', context: context);
 
@@ -128,30 +112,6 @@ mixin _$NotesStore on _NotesStore, Store {
     });
   }
 
-  late final _$changeCounterAtom =
-      Atom(name: '_NotesStore.changeCounter', context: context);
-
-  @override
-  int get changeCounter {
-    _$changeCounterAtom.reportRead();
-    return super.changeCounter;
-  }
-
-  @override
-  set changeCounter(int value) {
-    _$changeCounterAtom.reportWrite(value, super.changeCounter, () {
-      super.changeCounter = value;
-    });
-  }
-
-  late final _$initFirebaseAsyncAction =
-      AsyncAction('_NotesStore.initFirebase', context: context);
-
-  @override
-  Future<void> initFirebase() {
-    return _$initFirebaseAsyncAction.run(() => super.initFirebase());
-  }
-
   late final _$initAsyncAction =
       AsyncAction('_NotesStore.init', context: context);
 
@@ -167,6 +127,15 @@ mixin _$NotesStore on _NotesStore, Store {
   Future<void> getNotesFromFirebase() {
     return _$getNotesFromFirebaseAsyncAction
         .run(() => super.getNotesFromFirebase());
+  }
+
+  late final _$addNoteToFirebaseAsyncAction =
+      AsyncAction('_NotesStore.addNoteToFirebase', context: context);
+
+  @override
+  Future<void> addNoteToFirebase(String id, String title, String description) {
+    return _$addNoteToFirebaseAsyncAction
+        .run(() => super.addNoteToFirebase(id, title, description));
   }
 
   late final _$editNoteAsyncAction =
@@ -236,17 +205,6 @@ mixin _$NotesStore on _NotesStore, Store {
   }
 
   @override
-  void addNoteToFirebase(String id, String title, String description) {
-    final _$actionInfo = _$_NotesStoreActionController.startAction(
-        name: '_NotesStore.addNoteToFirebase');
-    try {
-      return super.addNoteToFirebase(id, title, description);
-    } finally {
-      _$_NotesStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void clearSearch() {
     final _$actionInfo = _$_NotesStoreActionController.startAction(
         name: '_NotesStore.clearSearch');
@@ -272,13 +230,11 @@ mixin _$NotesStore on _NotesStore, Store {
   String toString() {
     return '''
 notes: ${notes},
-pinnedNotes: ${pinnedNotes},
 searchResultNotes: ${searchResultNotes},
 initFireDB: ${initFireDB},
 isLoggedin: ${isLoggedin},
 current_user: ${current_user},
-collectionRef: ${collectionRef},
-changeCounter: ${changeCounter}
+collectionRef: ${collectionRef}
     ''';
   }
 }

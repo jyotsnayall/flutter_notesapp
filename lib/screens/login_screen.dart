@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:notesapp/screens/home_screen.dart';
@@ -13,7 +12,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,18 +25,15 @@ class _LoginScreenState extends State<LoginScreen> {
             SignInButton(
               Buttons.Google,
               onPressed: () async {
-                await signInWithGoogle();
-                store.isLoggedin = true;
-                //  final User? currentUser = await _auth.currentUser;
-                //  LocalDataSaver.saveLoginData(true);
-                //  LocalDataSaver.saveImg(currentUser!.photoURL.toString());
-                //  LocalDataSaver.saveMail(currentUser.email.toString());
-                //  LocalDataSaver.saveName(currentUser.displayName.toString());
-                //  await FireDB().getAllStoredNotes();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()),
-                );
+                await signInWithGoogle().then((value) {
+                  print("login value: ${store.isLoggedin}");
+                  store.isLoggedin = true;
+                  print("login value: ${store.isLoggedin}");
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomeScreen()),
+                  );
+                });
               },
             ),
           ],

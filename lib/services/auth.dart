@@ -5,26 +5,25 @@ import 'package:notesapp/stores/notes_store.dart';
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn googleSignIn = GoogleSignIn();
 
-//SIGN IN KA Function
 Future<User?> signInWithGoogle() async {
   try {
-    //SIGNING IN WITH GOOGLE
+    // signing in with google
     final GoogleSignInAccount? googleSignInAccount =
         await googleSignIn.signIn();
     final GoogleSignInAuthentication googleSignInAuthentication =
         await googleSignInAccount!.authentication;
 
-    //CREATING CREDENTIAL FOR FIREBASE
+    // creating credentials for firebase
     final AuthCredential credential = GoogleAuthProvider.credential(
       idToken: googleSignInAuthentication.idToken,
       accessToken: googleSignInAuthentication.accessToken,
     );
 
-    //SIGNING IN WITH CREDENTIAL & MAKING A USER IN FIREBASE  AND GETTING USER CLASS
+    // signing in with the credential and making a user in firebase and getting user class
     final userCredential = await _auth.signInWithCredential(credential);
     final User? user = userCredential.user;
 
-    //CHECKING IS ON
+    // checks
     assert(!user!.isAnonymous);
     assert(await user!.getIdToken() != null);
 
@@ -33,7 +32,6 @@ Future<User?> signInWithGoogle() async {
     print('User = ${user}');
 
     store.notes.clear();
-    store.pinnedNotes.clear();
 
     return user;
   } catch (e) {
@@ -44,6 +42,8 @@ Future<User?> signInWithGoogle() async {
 void signOut() async {
   await googleSignIn.signOut();
   await _auth.signOut();
+  store.isLoggedin = false;
+  print("login value: ${store.isLoggedin}");
+
   store.notes.clear();
-  store.pinnedNotes.clear();
 }

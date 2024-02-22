@@ -37,7 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // store.initFirebase();
     store.init();
   }
 
@@ -106,7 +105,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 // ),
-                if (store.pinnedNotes.isNotEmpty)
+                if (store.notes
+                    .where((element) => element.isPinned == true)
+                    .isNotEmpty)
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
@@ -120,8 +121,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                if (store.pinnedNotes.isNotEmpty)
-                  notesGridView(store.pinnedNotes),
+                if (store.notes
+                    .where((element) => element.isPinned == true)
+                    .isNotEmpty)
+                  notesGridView(store.notes, true),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
@@ -135,7 +138,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                notesGridView(store.notes),
+                if (store.notes.isEmpty)
+                  Flexible(
+                    child: Center(
+                      child: Text(
+                        'Start by adding a Note',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                  ),
+                notesGridView(store.notes, false),
               ],
             ),
           );
@@ -156,88 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-//   Widget notesStaggeredView(List<NotesModel> notes) {
-//   return Flexible(
-//     child: Padding(
-//       padding: EdgeInsets.only(top: 8),
-//       child: StaggeredGrid.countBuilder(
-//         crossAxisCount: 2,
-//         itemCount: notes.length,
-//         itemBuilder: (BuildContext context, int index) {
-//           final note = notes[index];
-//           final color = colors[index % colors.length];
-//           return InkWell(
-//             onTap: () {
-//               Navigator.of(context).push(
-//                 MaterialPageRoute(
-//                   builder: (context) => NoteDetails(note: note),
-//                 ),
-//               );
-//             },
-//             child: Card(
-//               color: color,
-//               child: Padding(
-//                 padding: const EdgeInsets.all(8.0),
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Row(
-//                       children: [
-//                         Expanded(
-//                           child: Text(
-//                             note.title,
-//                             style: TextStyle(
-//                               fontSize: 18,
-//                               fontWeight: FontWeight.bold,
-//                             ),
-//                             maxLines: 2,
-//                             overflow: TextOverflow.ellipsis,
-//                           ),
-//                         ),
-//                         InkWell(
-//                           child: Icon(Icons.delete, color: Colors.red),
-//                           onTap: () {
-//                             store.removeNote(note);
-//                           },
-//                         ),
-//                         SizedBox(width: 10),
-//                         InkWell(
-//                           onTap: () {
-//                             _editDialog(
-//                               note,
-//                               note.title.toString(),
-//                               note.description.toString(),
-//                             );
-//                           },
-//                           child: Icon(
-//                             Icons.edit,
-//                             color: const Color.fromARGB(207, 0, 0, 0),
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                     SizedBox(height: 8),
-//                     Text(
-//                       note.description,
-//                       style: TextStyle(fontSize: 14),
-//                       maxLines: 8,
-//                       overflow: TextOverflow.ellipsis,
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           );
-//         },
-//         staggeredTileBuilder: (int index) => StaggeredTile.fit(1),
-//         mainAxisSpacing: 4.0,
-//         crossAxisSpacing: 4.0,
-//       ),
-//     ),
-//   );
-// }
-
-  Widget notesGridView(List<NotesModel> notes) {
+  Widget notesGridView(List<NotesModel> notes, bool pinValue) {
     return Flexible(
       child: Padding(
         padding: EdgeInsets.only(top: 8),
@@ -250,75 +184,73 @@ class _HomeScreenState extends State<HomeScreen> {
           itemBuilder: (BuildContext context, int index) {
             final note = notes[index];
             final color = colors[index % colors.length];
-            return InkWell(
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => NoteDetails(note: notes[index]),
-                  ),
-                );
-              },
-              child: Card(
-                color: color,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              note.title,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+            if (note.isPinned == pinValue) {
+              return InkWell(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          NoteDetails(index: index),
+                    ),
+                  );
+                },
+                child: Card(
+                  color: color,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                note.title,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                          InkWell(
-                            child: Icon(Icons.delete, color: Colors.red),
-                            onTap: () {
-                              // store.removeNote(note);
-                              _deleteDialog(note);
-                            },
-                          ),
-                          SizedBox(width: 10),
-                          InkWell(
-                            onTap: () {
-                              _editDialog(
-                                note,
-                                note.title.toString(),
-                                note.description.toString(),
-                              );
-                              // Navigator.of(context).push(
-                              //   MaterialPageRoute(
-                              //     builder: (context) =>
-                              //         EditNote(note: note),
-                              //   ),
-                              // );
-                            },
-                            child: Icon(
-                              Icons.edit,
-                              color: const Color.fromARGB(207, 0, 0, 0),
+                            InkWell(
+                              child: Icon(Icons.delete, color: Colors.red),
+                              onTap: () {
+                                _deleteDialog(note);
+                              },
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        note.description,
-                        style: TextStyle(fontSize: 14),
-                        maxLines: 8,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                            SizedBox(width: 10),
+                            InkWell(
+                              onTap: () {
+                                _editDialog(
+                                  note,
+                                  note.title.toString(),
+                                  note.description.toString(),
+                                );
+                              },
+                              child: Icon(
+                                Icons.edit,
+                                color: const Color.fromARGB(207, 0, 0, 0),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          note.description,
+                          style: TextStyle(fontSize: 14),
+                          maxLines: 8,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
+              );
+            } else {
+              return Container();
+            }
           },
         ),
       ),
@@ -338,7 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => NoteDetails(note: note),
+                    builder: (context) => NoteDetails(index: index),
                   ),
                 );
               },
@@ -532,7 +464,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text('Add'),
               onPressed: () {
                 final id = Uuid().v1();
-                store.addNoteToFirebase(id, titleController.text, descriptionController.text);
+                store.addNoteToFirebase(
+                    id, titleController.text, descriptionController.text);
                 titleController.clear();
                 descriptionController.clear();
                 Navigator.pop(context);

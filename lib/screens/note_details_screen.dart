@@ -5,11 +5,13 @@ import 'package:notesapp/screens/edit_note_screen.dart';
 import 'package:notesapp/stores/notes_store.dart';
 
 class NoteDetails extends StatelessWidget {
-  NotesModel note;
+  // NotesModel note;
+  int index;
 
   NoteDetails({
     super.key,
-    required this.note,
+    // required this.note,
+    required this.index,
   });
 
   @override
@@ -36,34 +38,25 @@ class NoteDetails extends StatelessWidget {
               splashColor: Colors.transparent,
               enableFeedback: true,
               onPressed: () async {
-                print('List reference: ${note.hashCode} Before Pinning');
                 print("Button Pressed");
-                // await store.togglePin(note);
-
-                await store.togglePin(note).then((_) {
-                  // print('Pinned: ${note.isPinned} inside then');
-                  // print('List reference: ${note.hashCode} inside then');
-                  store.changeCounter++;
+                print('Store note reference (Before): ${store.notes[index].hashCode}');
+                
+                await store.togglePin(store.notes[index]).then((value) {
+                  print('Store Note Pinned: ${store.notes[index].isPinned}');
+                  print('Store note reference (After): ${store.notes[index].hashCode} inside then');
                 });
-
-                print('Pinned: ${note.isPinned}');
-                await store.fetchNote(note.id).then((value) {
-                  note = value;
-                  store.changeCounter++;
-                });
-                // store.changeCounter++;
-                // print('List reference: ${note.hashCode} After calling method');
-                // print('Pinned: ${note.isPinned}');
+                print('Pinned: ${store.notes[index].isPinned}');
                 // Navigator.pop(context);
               },
               icon: Observer(
                 builder: (context) {
                   print('Rebuilding Icon widget');
                   // print('List reference: ${note.hashCode} inside Observer');
-                  print('changed: ${store.changeCounter}');
-                  print('note pin: ${note.isPinned}');
+                  print('note pin: ${store.notes[index].isPinned}');
                   return Icon(
-                    note.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                    store.notes[index].isPinned
+                        ? Icons.push_pin
+                        : Icons.push_pin_outlined,
                   );
                 },
               ),
@@ -87,7 +80,7 @@ class NoteDetails extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (context) => EditNote(noteId: note.id),
+                    builder: (context) => EditNote(noteId: store.notes[index].id),
                   ),
                 );
               },
@@ -118,7 +111,7 @@ class NoteDetails extends StatelessWidget {
                     Align(
                       alignment: Alignment.topLeft,
                       child: Text(
-                        note.title,
+                        store.notes[index].title,
                         style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.w700,
@@ -132,7 +125,7 @@ class NoteDetails extends StatelessWidget {
                     Align(
                       alignment: Alignment.topLeft,
                       child: Text(
-                        note.description,
+                        store.notes[index].description,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w300,
